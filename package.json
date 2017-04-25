@@ -1,0 +1,23 @@
+{
+  "name": "graph-twitter",
+  "version": "1.0.0",
+  "description": "Microsoft Graph & Twitter",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "tsc": "tsc"
+  },
+  "author": "Hongbo Miao",
+  "license": "ISC",
+  "dependencies": {
+    "@microsoft/microsoft-graph-client": "0.4.1",
+    "node-fetch": "1.6.3",
+    "twitter": "1.7.0"
+  },
+  "devDependencies": {
+    "@microsoft/microsoft-graph-types": "0.4.1",
+    "@types/node": "7.0.13",
+    "@types/twitter": "0.0.28",
+    "typescript": "2.2.2"
+  }
+}
