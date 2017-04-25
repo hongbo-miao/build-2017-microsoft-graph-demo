@@ -4,7 +4,7 @@ import { Client } from '@microsoft/microsoft-graph-client'
 
 import { MicrosoftAppRefreshToken, MicrosoftAppSecret, MicrosoftAppID, MicrosoftAppUrl } from '../config/'
 
-export async function graphClient() {
+export async function getGraphClient() {
   const accessToken = await getAccessToken();
 
   return Client.init({
