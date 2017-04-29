@@ -1,6 +1,6 @@
 import * as fetch from 'node-fetch';
 import { Headers } from 'node-fetch';
-import { Client } from '@microsoft/microsoft-graph-client'
+import { Client } from '@microsoft/microsoft-graph-client';
 
 import { MicrosoftAppRefreshToken, MicrosoftAppSecret, MicrosoftAppID, MicrosoftAppUrl } from '../config/'
 

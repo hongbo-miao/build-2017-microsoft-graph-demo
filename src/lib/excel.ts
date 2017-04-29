@@ -12,6 +12,10 @@ export class Excel {
   private tweetCount: number = 0;
   private statistics: any[][];
 
+  constructor() {
+    this.init();
+  }
+
   public async init() {
     this.graphClient = await getGraphClient();
 
@@ -73,8 +77,6 @@ export class Excel {
   }
 
   public async updateSheets(ev: any) {
-    await this.init();
-
     this.tweetCount++;
     
     const url = `https://twitter.com/${ev.user.screen_name}/status/${ev.id_str}`;
