@@ -29,13 +29,13 @@ export async function getAccessToken() {
     }
   };
 
-  const searchParams = Object.keys(body).map((key) =>
-    `${encodeURIComponent(key)}=${encodeURIComponent(body[key])}`
-  ).join('&');
+  // search params
+  options.body = Object
+    .keys(body)
+    .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(body[key])}`)
+    .join('&');
 
-  options.body = searchParams;
-
-  return fetch('https://login.microsoftonline.com/common/oauth2/v2.0/token', options).then(rawResponse =>
-    rawResponse.json()
-  ).then((json) => json['access_token'])
+  return fetch('https://login.microsoftonline.com/common/oauth2/v2.0/token', options)
+    .then(res => res.json())
+    .then(json => json['access_token']);
 }

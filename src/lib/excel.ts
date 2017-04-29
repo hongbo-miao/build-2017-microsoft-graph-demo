@@ -12,11 +12,7 @@ export class Excel {
   private tweetCount: number = 0;
   private statistics: any[][];
 
-  constructor() {
-    this.init();
-  }
-
-  private async init() {
+  public async init() {
     this.graphClient = await getGraphClient();
 
     this.tweetCount = await this.getTweetCount();
@@ -30,7 +26,7 @@ export class Excel {
       .get()
       .then(res => {
         // empty sheet is be [['']]
-        return res.text && res.text.length && res.text[0][0] ? res.text.length : 0
+        return res.text && res.text.length && res.text[0][0] ? res.text.length : 0;
       });
   }
 
@@ -56,10 +52,12 @@ export class Excel {
   }
 
   private async updateStatistics(matchedLanguages: string[]) {
-    if (!matchedLanguages || !matchedLanguages.length) return;
+    if (!matchedLanguages || !matchedLanguages.length || !this.statistics || !this.statistics.length) return;
 
     matchedLanguages.forEach(language => {
       const idx = getIndexFrom2dArray(this.statistics, language);
+
+      if (!idx || !idx.length) return;
 
       let languageCount = Number(this.statistics[idx[0]][idx[1] + 1]);
       this.statistics[idx[0]][idx[1] + 1] = String(languageCount + 1);
@@ -68,18 +66,20 @@ export class Excel {
     const newStatistics: WorkbookRange = { values: this.statistics };
 
     return await this.graphClient
-      .api(`/me/drive/items/${this.driveItemId}/workbook/worksheets/Sheet2/usedRange`)
+      .api(`/me/drive/items/${this.driveItemId}/workbook/worksheets/${this.statisticsSheet}/usedRange`)
       .patch(newStatistics, (err, res) => {
         debugger;
       });
   }
 
-  public updateSheets(ev: any) {
+  public async updateSheets(ev: any) {
+    await this.init();
+
     this.tweetCount++;
     
     const url = `https://twitter.com/${ev.user.screen_name}/status/${ev.id_str}`;
 
-    this.addTweet(
+    await this.addTweet(
       ev.user.name,                 // name
       ev.user.screen_name,          // username
       ev.user.location,             // location
@@ -88,6 +88,6 @@ export class Excel {
     );
 
     const matchedLanguages = extractLanguage(ev.text);
-    this.updateStatistics(matchedLanguages);
+    await this.updateStatistics(matchedLanguages);
   }
 }

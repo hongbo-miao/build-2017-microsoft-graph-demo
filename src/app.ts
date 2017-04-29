@@ -1,6 +1,7 @@
 import { twitterClient, Excel } from './lib/';
 
 const excel = new Excel();
+
 const stream = twitterClient.stream('statuses/filter', { track: 'JavaScript' });  // '#MicrosoftGraph'
 
 stream.on('data', ev => {
