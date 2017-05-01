@@ -1,13 +1,17 @@
 import { twitterClient, Excel } from './lib/';
 
-const excel = new Excel();
+async function main() {
+  const excel = new Excel();
+  await excel.init();
 
-const stream = twitterClient.stream('statuses/filter', { track: 'JavaScript' });  // '#MicrosoftGraph'
+  const stream = twitterClient.stream('statuses/filter', { track: 'JavaScript' });  // '#MicrosoftGraph'
+  stream.on('data', ev => {
+    excel.updateSheets(ev);
+  });
 
-stream.on('data', ev => {
-  excel.updateSheets(ev);
-});
+  stream.on('error', err => {
+    throw err;
+  });
+}
 
-stream.on('error', err => {
-  throw err;
-});
+main();

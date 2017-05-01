@@ -1,5 +1,5 @@
 import { Client } from '@microsoft/microsoft-graph-client';
-import { WorkbookRange } from '@microsoft/microsoft-graph-types';
+import { WorkbookRange, Message } from '@microsoft/microsoft-graph-types';
 
 import { getGraphClient, getIndexFrom2dArray, extractLanguage } from './';
 
@@ -7,14 +7,13 @@ export class Excel {
   private driveItemId = '01KLKXRJ26T2MN4VG5VFBY2UIHU5NGG34O';
   private tweetsSheet = 'Sheet1';
   private statisticsSheet = 'Sheet2';
+  private chart = 'Chart 1';
+  // private chartBase64 = '';
+  // private email = 'example@mail.com';
 
   private graphClient: Client;
   private tweetCount: number = 0;
   private statistics: any[][];
-
-  constructor() {
-    this.init();
-  }
 
   public async init() {
     this.graphClient = await getGraphClient();
@@ -92,4 +91,46 @@ export class Excel {
     const matchedLanguages = extractLanguage(ev.text);
     await this.updateStatistics(matchedLanguages);
   }
+
+//   public async getChart() {
+//     return await this.graphClient
+//       .api(`/me/drive/items/${this.driveItemId}/workbook/worksheets/${this.statisticsSheet}/charts/${this.chart}/Image`)
+//       .version('beta')
+//       .get()
+//       .then(res => {
+//         console.log('res.value', res.value);
+//         return res.value;
+//       });
+//   }
+
+//   public async sendMail() {
+//     console.log('image', this.chartBase64);
+
+//     let message: Message = {
+//       subject: 'Microsoft Graph TypeScript Sample',
+//       toRecipients: [{
+//         emailAddress: {
+//           address: this.email
+//         }
+//       }],
+//       body: {
+//         content: `
+// <h1>Microsoft Graph</h1>
+// <p>This is the report</p>
+
+// <img src="data:image/png;base64,${this.chartBase64}">
+// `,
+//         contentType: 'html'
+//       }
+//     };
+
+//     return await this.graphClient
+//       .api('/users/me/sendMail')
+//       .post({ message })
+//       .then(res => {
+//         console.log('Mail sent!')
+//       }).catch(err => {
+//         debugger;
+//       });
+//   }
 }
