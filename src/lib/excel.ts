@@ -5,43 +5,32 @@ import { getGraphClient, getIndexFrom2dArray, extractLanguage } from './';
 
 export class Excel {
   private driveItemId = '01KLKXRJ26T2MN4VG5VFBY2UIHU5NGG34O';
-  private tweetsSheet = 'Sheet1';
+  // private tweetsSheet = 'Sheet1';
   private statisticsSheet = 'Sheet2';
-  private chart = 'Chart 1';
+  private table = 'Table1';
+  // private chart = 'Chart 1';
   // private chartBase64 = '';
   // private email = 'example@mail.com';
 
   private graphClient: Client;
-  private tweetCount: number = 0;
   private statistics: any[][];
 
   public async init() {
     this.graphClient = await getGraphClient();
 
-    this.tweetCount = await this.getTweetCount();
     this.statistics = await this.getStatistics();
   }
 
-  private async getTweetCount() {
-    return await this.graphClient
-      .api(`/me/drive/items/${this.driveItemId}/workbook/worksheets/${this.tweetsSheet}/usedRange`)
-      .version('beta')
-      .get()
-      .then(res => {
-        // empty sheet is be [['']]
-        return res.text && res.text.length && res.text[0][0] ? res.text.length : 0;
-      });
-  }
-
   private async addTweet(name: string, username: string, location: string, url: string, tweet: string) {
-    
-    const tweetItem: WorkbookRange = {
+    const tweetItem = {
+      index: null,
       values: [[name, username, location, url, tweet]]
     };
 
     return await this.graphClient
-      .api(`/me/drive/items/${this.driveItemId}/workbook/worksheets/${this.tweetsSheet}/range(address='A${this.tweetCount}:E${this.tweetCount}')`)
-      .patch(tweetItem, (err, res) => {
+      .api(`/me/drive/items/${this.driveItemId}/workbook/tables/${this.table}/rows/add`)
+      .version('beta')
+      .post(tweetItem, (err, res) => {
         debugger;
       });
   }
@@ -76,8 +65,6 @@ export class Excel {
   }
 
   public async updateSheets(ev: any) {
-    this.tweetCount++;
-    
     const url = `https://twitter.com/${ev.user.screen_name}/status/${ev.id_str}`;
 
     await this.addTweet(
