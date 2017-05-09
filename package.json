@@ -1,7 +1,7 @@
 {
-  "name": "graph-twitter",
+  "name": "build-2017-microsoft-graph-demo",
   "version": "1.0.0",
-  "description": "Microsoft Graph & Twitter",
+  "description": "Microsoft Graph demo for Microsoft Build 2017",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -16,8 +16,8 @@
   },
   "devDependencies": {
     "@microsoft/microsoft-graph-types": "0.4.1",
-    "@types/node": "7.0.13",
+    "@types/node": "7.0.18",
     "@types/twitter": "0.0.28",
-    "typescript": "2.2.2"
+    "typescript": "2.3.2"
   }
 }

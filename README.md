@@ -1,1 +1,1 @@
-# Microsoft Graph demo at Microsoft Build 2017
+# Microsoft Graph demo for Microsoft Build 2017
