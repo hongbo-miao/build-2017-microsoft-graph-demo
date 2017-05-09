@@ -5,6 +5,7 @@ async function main() {
   await excel.init();
 
   const stream = twitterClient.stream('statuses/filter', { track: 'JavaScript' });  // '#MicrosoftGraph'
+
   stream.on('data', ev => {
     excel.updateSheets(ev);
   });

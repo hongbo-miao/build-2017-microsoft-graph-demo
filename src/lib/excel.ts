@@ -1,24 +1,20 @@
 import { Client } from '@microsoft/microsoft-graph-client';
-import { WorkbookRange, Message } from '@microsoft/microsoft-graph-types';
+import { WorkbookRange } from '@microsoft/microsoft-graph-types';
 
-import { getGraphClient, getIndexFrom2dArray, extractLanguage } from './';
+import { DriveItemId } from '../config/';
+import { getGraphClient, extractLanguage } from './';
 
 export class Excel {
-  private driveItemId = '01KLKXRJ26T2MN4VG5VFBY2UIHU5NGG34O';
-  // private tweetsSheet = 'Sheet1';
-  private statisticsSheet = 'Sheet2';
-  private table = 'Table1';
-  // private chart = 'Chart 1';
-  // private chartBase64 = '';
-  // private email = 'example@mail.com';
+  private tweetTable = 'Table1';
+  private statisticTable = 'Table2';
 
   private graphClient: Client;
-  private statistics: any[][];
+  private statistics = { };
 
   public async init() {
     this.graphClient = await getGraphClient();
 
-    this.statistics = await this.getStatistics();
+    await this.initStatistics();
   }
 
   private async addTweet(name: string, username: string, location: string, url: string, tweet: string) {
@@ -28,37 +24,47 @@ export class Excel {
     };
 
     return await this.graphClient
-      .api(`/me/drive/items/${this.driveItemId}/workbook/tables/${this.table}/rows/add`)
+      .api(`/me/drive/items/${DriveItemId}/workbook/tables/${this.tweetTable}/rows/add`)
       .version('beta')
       .post(tweetItem, (err, res) => {
         debugger;
       });
   }
 
-  private async getStatistics() {
+  private async initStatistics() {
     return await this.graphClient
-      .api(`/me/drive/items/${this.driveItemId}/workbook/worksheets/${this.statisticsSheet}/usedRange`)
+      .api(`/me/drive/items/${DriveItemId}/workbook/tables/${this.statisticTable}/rows`)
       .version('beta')
       .get()
-      .then(res => res.text);
+      .then(res => {
+        if (!res || !res.value) return;
+
+        res.value.forEach(statistic => {
+          const [language, count] = statistic.values[0];
+          this.statistics[language] = count;
+        });
+
+        return;
+      });
   }
 
   private async updateStatistics(matchedLanguages: string[]) {
-    if (!matchedLanguages || !matchedLanguages.length || !this.statistics || !this.statistics.length) return;
+    if (!matchedLanguages || !matchedLanguages.length) return;
 
-    matchedLanguages.forEach(language => {
-      const idx = getIndexFrom2dArray(this.statistics, language);
-
-      if (!idx || !idx.length) return;
-
-      let languageCount = Number(this.statistics[idx[0]][idx[1] + 1]);
-      this.statistics[idx[0]][idx[1] + 1] = String(languageCount + 1);
+    matchedLanguages.map(async language => {
+      this.statistics[language]++;
     });
 
-    const newStatistics: WorkbookRange = { values: this.statistics };
+    // convert object to array
+    // { 'a': 1, 'b': 2 } -> [['a', 1], ['b', 2]]
+    const arrayStatistics = Object.keys(this.statistics).map(e => {
+      return [e, this.statistics[e]];
+    });
+
+    const newStatistics: WorkbookRange = { values: arrayStatistics };
 
     return await this.graphClient
-      .api(`/me/drive/items/${this.driveItemId}/workbook/worksheets/${this.statisticsSheet}/usedRange`)
+      .api(`/me/drive/items/${DriveItemId}/workbook/tables/${this.statisticTable}/databodyrange`)
       .patch(newStatistics, (err, res) => {
         debugger;
       });
@@ -76,48 +82,7 @@ export class Excel {
     );
 
     const matchedLanguages = extractLanguage(ev.text);
+
     await this.updateStatistics(matchedLanguages);
   }
-
-//   public async getChart() {
-//     return await this.graphClient
-//       .api(`/me/drive/items/${this.driveItemId}/workbook/worksheets/${this.statisticsSheet}/charts/${this.chart}/Image`)
-//       .version('beta')
-//       .get()
-//       .then(res => {
-//         console.log('res.value', res.value);
-//         return res.value;
-//       });
-//   }
-
-//   public async sendMail() {
-//     console.log('image', this.chartBase64);
-
-//     let message: Message = {
-//       subject: 'Microsoft Graph TypeScript Sample',
-//       toRecipients: [{
-//         emailAddress: {
-//           address: this.email
-//         }
-//       }],
-//       body: {
-//         content: `
-// <h1>Microsoft Graph</h1>
-// <p>This is the report</p>
-
-// <img src="data:image/png;base64,${this.chartBase64}">
-// `,
-//         contentType: 'html'
-//       }
-//     };
-
-//     return await this.graphClient
-//       .api('/users/me/sendMail')
-//       .post({ message })
-//       .then(res => {
-//         console.log('Mail sent!')
-//       }).catch(err => {
-//         debugger;
-//       });
-//   }
 }

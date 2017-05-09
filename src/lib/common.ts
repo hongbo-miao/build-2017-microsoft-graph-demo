@@ -1,11 +1,3 @@
-export function getIndexFrom2dArray(arr: any[][], val: any): [number, number] {
-  for (let i = 0; i < arr.length; i++) {
-    const idx = arr[i].indexOf(val);
-
-    if (idx > -1) return [i, idx];
-  }
-}
-
 const languages = [
   'JavaScript',
   'TypeScript',
